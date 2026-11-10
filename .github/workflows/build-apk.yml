@@ -2,6 +2,8 @@ name: Build APK
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,3 +27,9 @@ jobs:
         with:
           name: nse-day-trade-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish as a Release (easy phone download)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk nse-day-trade-plan.apk
+          gh release create "apk-${{ github.run_number }}" nse-day-trade-plan.apk --title "NSE Day Trade Plan APK (build ${{ github.run_number }})" --notes "Debug APK. Plans only, never places orders. Not financial advice." --latest
